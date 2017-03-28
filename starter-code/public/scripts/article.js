@@ -26,13 +26,9 @@
 
     // TODO: Refactor this forEach code, by using a `.map` call instead, since what we are trying to accomplish
     // is the transformation of one colleciton into another.
-    Article.all = rows.map(new Article(ele));
-    /* OLD forEach():
-    rawData.forEach(function(ele) {
-    Article.all.push(new Article(ele));
-  });
-  */
-
+    Article.all = rows.map(function(ele) {
+      return new Article(ele);
+    });
   };
 
   Article.fetchAll = callback => {
@@ -47,19 +43,23 @@
 
   // TODO: Chain together a `map` and a `reduce` call to get a rough count of all words in all articles.
   Article.numWordsAll = () => {
-    console.log(Article.all.map(this.body.split(' ').length));
     return Article.all.map(function(ele){
       return ele.body.split(' ').length;
-    }).reduce(function(ele){
-      
+    }).reduce((acc, val) => {
+      return acc + val;
     });
   };
 
   // TODO: Chain together a `map` and a `reduce` call to produce an array of unique author names.
   Article.allAuthors = () => {
-    return Article.all.map(function(ele){
+    return Article.all.map(function(ele) {
       return ele.author;
-    }).reduce();
+    }).reduce((acc, val) => {
+      if (acc.indexOf(val) === -1){
+        acc.push(val);
+      }
+      return acc;
+    }, [])
   };
 
   Article.numWordsByAuthor = () => {
@@ -68,6 +68,16 @@
       // the author's name, as well as the total number of words across all articles
       // written by the specified author.
 
+      return {
+        name: author,
+        words: Article.all.filter(function(article){
+          return article.author === author
+        }).map(function(ele){
+          return ele.body.split(' ').length;
+        }).reduce((acc, val)=>{
+          return acc + val;
+        })
+      };
     })
   };
 
